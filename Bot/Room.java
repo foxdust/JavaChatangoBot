@@ -9,9 +9,11 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.math.BigInteger;
 import java.net.Socket;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 import java.nio.ByteBuffer;
 import java.nio.channels.Channels;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.ReadableByteChannel;
 import java.nio.channels.WritableByteChannel;
 import java.nio.charset.Charset;
@@ -48,6 +50,11 @@ public class Room {
 	private String uid = "";
 	int port = 5228;
 	static Socket socket;
+
+    /**
+     * Running boolean for thread, disconnects if false
+     */
+	private boolean running = false;
 
 	/**
 	 * Default Room name
@@ -260,6 +267,11 @@ public class Room {
 		System.out.println("[Room] Host : "+host);
 		Bot.print("[Room] Host : "+host);
 		socket = createSocket(host, port);
+		//socket timeout prevents thread from blocking
+		socket.setSoTimeout(500);
+
+		//set bot to running state
+		running = true;
 		
 		//start reading loop - response from server//
 		readResponse();
@@ -314,7 +326,8 @@ public class Room {
 					DataInputStream sockInput = new DataInputStream(socket.getInputStream());
 					ReadableByteChannel readChannel = Channels.newChannel(sockInput);
 
-			        while (true) {
+					//changed to check running, allows disconnect
+			        while (running) {
 			            // see if any message has been received//
 			            ByteBuffer bufferA = ByteBuffer.allocate(10000000);
 			            
@@ -323,15 +336,22 @@ public class Room {
 			            
 			            //empty message//
 			            String message = "";
-			            
-			            //Read bytes//
-			            while ((count = readChannel.read(bufferA)) > 0) {
-			                // flip the byte buffer to start reading//
-			                bufferA.flip();
-			                //decode bytes and add each char-construct message//
-			                message += Charset.defaultCharset().decode(bufferA);
-			 
-			            }
+
+			            //allow socket timeout to prevent blocking
+                        try {
+                            //Read bytes//
+                            while ((count = readChannel.read(bufferA)) > 0) {
+                                // flip the byte buffer to start reading//
+                                bufferA.flip();
+                                //decode bytes and add each char-construct message//
+                                message += Charset.defaultCharset().decode(bufferA);
+
+                            }
+                        } catch (SocketTimeoutException ignored){
+
+                        } catch (ClosedByInterruptException ignored) {
+
+                        }
 			            //check if message had data//
 			            if (message.length() > 0 && !message.trim().isEmpty()) {
 			            	
