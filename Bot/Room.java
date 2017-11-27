@@ -86,15 +86,8 @@ public class Room {
     /**
      * default credentals
      */
-	private String user_id = "mentalencryption";
-	private String password = "YouKnowBetterThanToThinkThisIsThePassword=?";
-
-	
-	/**
-	 * used in logging in as anon or with account 
-	 * 0 = default , 1 = anon , 2 = account 
-	 */
-	int x = 0;
+	private String user_id = "";
+	private String password = "";
 	
 	/**
 	 * First Command boolean
@@ -158,7 +151,6 @@ public class Room {
 	 */
 	public Room(String roomS) throws UnknownHostException, IOException{
 		roomame = roomS;
-		x = 1;
 		connect();
 	}
 
@@ -175,7 +167,6 @@ public class Room {
 		roomame = roomS;
 		user_id = userS;
 		password = passS;
-		x = 2;
 		connect();
 	}
 
@@ -280,21 +271,22 @@ public class Room {
 		String loginStr = "";
 		
 		//Login as anon//
-		if(x == 1){
+		if(password.isEmpty()){
 			loginStr = "bauth:"+roomame+":"+ uid;
 		}
 		//login with account//
-		if(x == 2){
-			loginStr = "bauth:"+roomame+":"+ uid+":"+ user_id+":"+ password;
-		}
-		
-		//default *unused*//
-		if(x == 0){
+		else {
 			loginStr = "bauth:"+roomame+":"+ uid+":"+ user_id+":"+ password;
 		}
 		
 		//Send login command//
 		sendLoginCommand(loginStr);
+
+		//If no password, attempt to set unregistered name
+        if (password.isEmpty()) {
+            writeToServer("\r\n");
+            writeToServer("blogin:" + user_id + "\r\n");
+        }
 		
 		//Start idle ping//
 		startIdlePing();

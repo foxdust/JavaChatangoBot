@@ -42,8 +42,6 @@ public class Bot {
 	boolean useRoomB;
 	JRadioButton usePM;
 	boolean usePMB;
-	JRadioButton useAnon;
-	boolean useAnonB;
 	JTextArea info;
 	
 	static PrintWriter writer;
@@ -127,7 +125,7 @@ public class Bot {
 
 		usePM = new JRadioButton("Use PM");
 		useRoom = new JRadioButton("Use Rooms");
-		useAnon = new JRadioButton("Login as Anon");
+		useRoom.setSelected(true);
 
 		login = new JButton("Login");
 		login.addActionListener(new ActionListener() {
@@ -136,48 +134,25 @@ public class Bot {
 			public void actionPerformed(ActionEvent e) {
 				usePMB = usePM.isSelected();
 				useRoomB = useRoom.isSelected();
-				useAnonB = useAnon.isSelected();
-				if (useAnonB) {
-					if (useRoomB) {
-						try {
-							String roomS = room.getText().toLowerCase().trim();
-							new Room(roomS);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-					}
-					if (usePMB) {
-						try {
-							String userS = user.getText().toLowerCase().trim();
-							String passS = password.getText().toLowerCase()
-									.trim();
-							new Pm(userS, passS);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
+				if (useRoomB) {
+					try {
+						String userS = user.getText().toLowerCase().trim();
+						String roomS = room.getText().toLowerCase().trim();
+						String passS = password.getText().toLowerCase()
+								.trim();
+						new Room(roomS, userS, passS);
+					} catch (IOException e1) {
+						e1.printStackTrace();
 					}
 				}
-				if (!useAnonB) {
-					if (useRoomB) {
-						try {
-							String userS = user.getText().toLowerCase().trim();
-							String roomS = room.getText().toLowerCase().trim();
-							String passS = password.getText().toLowerCase()
-									.trim();
-							new Room(roomS, userS, passS);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
-					}
-					if (usePMB) {
-						try {
-							String userS = user.getText().toLowerCase().trim();
-							String passS = password.getText().toLowerCase()
-									.trim();
-							new Pm(userS, passS);
-						} catch (IOException e1) {
-							e1.printStackTrace();
-						}
+				if (usePMB) {
+					try {
+						String userS = user.getText().toLowerCase().trim();
+						String passS = password.getText().toLowerCase()
+								.trim();
+						new Pm(userS, passS);
+					} catch (IOException e1) {
+						e1.printStackTrace();
 					}
 				}
 				infoFrame.dispose();
@@ -252,7 +227,6 @@ public class Bot {
 		infoFrame.add(info);
 		infoFrame.add(usePM);
 		infoFrame.add(useRoom);
-		infoFrame.add(useAnon);
 		infoFrame.add(room);
 		infoFrame.add(user);
 		infoFrame.add(password);
