@@ -5,3 +5,5 @@ This bot library is a Room and Pms Chatango bot written in Java. It Uses a GUI t
                           **Although Base functionnality works it is still a new project under development.**
                           
                           -Jon Rollins , J.P. - DigitalCLay
+
+Welcome to the Foxdust fork!  I used this chatbot for something else and improved it along the way, so I've come back and forked it properly to share some of those improvements, including but not limited to the ability to actually disconnect and reconnect the bot.  Enjoy!
