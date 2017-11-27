@@ -35,6 +35,7 @@ public class Bot {
 
 	JFrame infoFrame;
 	JButton login;
+	JButton disconnect;
 	JTextField room;
 	JTextField user;
 	JTextField password;
@@ -43,6 +44,7 @@ public class Bot {
 	JRadioButton usePM;
 	boolean usePMB;
 	JTextArea info;
+	Room chatroom;
 	
 	static PrintWriter writer;
 
@@ -123,6 +125,7 @@ public class Bot {
 		password.setEditable(true);
 		password.setSize(150, 20);
 
+
 		usePM = new JRadioButton("Use PM");
 		useRoom = new JRadioButton("Use Rooms");
 		useRoom.setSelected(true);
@@ -135,12 +138,13 @@ public class Bot {
 				usePMB = usePM.isSelected();
 				useRoomB = useRoom.isSelected();
 				if (useRoomB) {
-					try {
 						String userS = user.getText().toLowerCase().trim();
 						String roomS = room.getText().toLowerCase().trim();
 						String passS = password.getText().toLowerCase()
 								.trim();
-						new Room(roomS, userS, passS);
+						chatroom = new Room(roomS, userS, passS);
+					try{
+						chatroom.connect();
 					} catch (IOException e1) {
 						e1.printStackTrace();
 					}
@@ -155,9 +159,10 @@ public class Bot {
 						e1.printStackTrace();
 					}
 				}
-				infoFrame.dispose();
+				infoFrame.setVisible(false);
 				
 				JFrame consoleCmds = new JFrame();
+				consoleCmds.setLayout(new FlowLayout());
 				consoleCmds.setSize(300,200);
 				consoleCmds.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 				consoleCmds.setResizable(false);
@@ -197,7 +202,7 @@ public class Bot {
 								+"-/cmd:getowner\n"
 								+"-/cmd:getchatlist\n"
 								+"-/cmd:getcount\n"
-								
+
 								+"\n"
 								
 								+"***PM***\n"
@@ -211,10 +216,24 @@ public class Bot {
 								
 						);
 
+				disconnect = new JButton("disconnect");
+				disconnect.setSize(50,20);
+				disconnect.addActionListener(new ActionListener() {
+					@Override
+					public void actionPerformed(ActionEvent e) {
+						chatroom.disconnect();
+						consoleCmds.dispose();
+						infoFrame.setVisible(true);
+					}
+				});
+
+				consoleCmds.add(disconnect);
+
 				cmdList.setEditable(false);
 				cmdList.setForeground(Color.WHITE);
 				cmdList.setBackground(Color.BLACK);
 				consoleCmds.add(new JScrollPane(cmdList));
+
 				consoleCmds.setVisible(true);
 			}
 		});

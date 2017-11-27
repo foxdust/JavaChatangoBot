@@ -61,7 +61,10 @@ public class Room {
 	 */
 	String roomame = "digitalmasterminds69";
 
-	
+    /**
+     * Global thread for interruption
+     */
+	private Thread readThread;
 	/**
 	 * Input and output - for reading and writing to and from server
 	 */
@@ -135,23 +138,19 @@ public class Room {
 	
 	/**
 	 * Default constructor ***unused***
-	 * @throws UnknownHostException
-	 * @throws IOException
 	 */
-	public Room() throws UnknownHostException, IOException {
-		connect();
+	public Room() {
+
 	}
 	
 	
 	/**
 	 * Constructor to login as anon
 	 * @param roomS
-	 * @throws UnknownHostException
-	 * @throws IOException
 	 */
-	public Room(String roomS) throws UnknownHostException, IOException{
+	public Room(String roomS){
 		roomame = roomS;
-		connect();
+
 	}
 
 	
@@ -160,14 +159,11 @@ public class Room {
 	 * @param roomS
 	 * @param userS
 	 * @param passS
-	 * @throws UnknownHostException
-	 * @throws IOException
 	 */
-	public Room(String roomS, String userS, String passS) throws UnknownHostException, IOException{
+	public Room(String roomS, String userS, String passS){
 		roomame = roomS;
 		user_id = userS;
 		password = passS;
-		connect();
 	}
 
 	/**
@@ -175,8 +171,11 @@ public class Room {
 	 * @throws UnknownHostException
 	 * @throws IOException
 	 */
-	private void connect() throws UnknownHostException, IOException{
-		
+	public void connect() throws UnknownHostException, IOException{
+        //set bot to running state
+        running = true;
+
+        _chatangoTagserver=new LinkedHashMap<String, Integer>();
 		//Tag server weights//
 		_chatangoTagserver.put("5", w12);
 		_chatangoTagserver.put("6", w12);
@@ -260,9 +259,6 @@ public class Room {
 		socket = createSocket(host, port);
 		//socket timeout prevents thread from blocking
 		socket.setSoTimeout(500);
-
-		//set bot to running state
-		running = true;
 		
 		//start reading loop - response from server//
 		readResponse();
@@ -278,7 +274,9 @@ public class Room {
 		else {
 			loginStr = "bauth:"+roomame+":"+ uid+":"+ user_id+":"+ password;
 		}
-		
+
+		//ensure first command is true if reconnected
+        firstCommand = true;
 		//Send login command//
 		sendLoginCommand(loginStr);
 
@@ -299,10 +297,23 @@ public class Room {
 		}
 		
 		//Post login msg to chatroom//
-		sendMsg("Hello, I've logged in successfully. ");
+		//sendMsg("Hello, I've logged in successfully. ");
 
 	}
-	
+
+    public void disconnect() {
+        running = false;
+        readThread.interrupt();
+        try {
+            socket.close();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public boolean isRunning(){
+	    return running;
+    }
 
 	/**
 	 * Read response from server - Loop
@@ -310,7 +321,7 @@ public class Room {
 	 */
 	private void readResponse() throws IOException {
 		//Read Loop Thread//
-		Thread readThread = new Thread(new Runnable() {
+		readThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
@@ -1248,7 +1259,6 @@ public class Room {
 	
 	/**
 	 * Flag a user
-	 * @param msgId
 	 * @throws IOException
 	 */
 	private void clearAllMsg() throws IOException{
