@@ -5,6 +5,8 @@ import java.awt.Color;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -20,7 +22,7 @@ import javax.swing.JRadioButton;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
- 
+
 /** 
  * @author Jon Rollins Synaptic Studios Jp - 2015
  * Chatango Room Client
@@ -115,13 +117,61 @@ public class Bot {
 		infoFrame.setLayout(new FlowLayout());
 		infoFrame.setTitle("Java Chatango Client : 0.9 - Room and User Info ");
 
-		room = new JTextField("digitalmasterminds69");
+		room = new JTextField("roomname");
 		room.setEditable(true);
 		room.setSize(150, 20);
-		user = new JTextField("mentalencryption");
+		room.setColumns(12);
+		room.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (room.getText().equals("roomname")){
+					room.setText("");
+				}
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (room.getText().equals("")){
+					room.setText("roomname");
+				}
+			}
+		});
+		user = new JTextField("username");
+		user.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (user.getText().equals("username")){
+					user.setText("");
+				}
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (user.getText().equals("")){
+					user.setText("username");
+				}
+			}
+		});
+		user.setColumns(12);
 		user.setEditable(true);
 		user.setSize(150, 20);
-		password = new JTextField("YourPassword");
+		password = new JTextField("password");
+		password.addFocusListener(new FocusListener() {
+			@Override
+			public void focusGained(FocusEvent e) {
+				if (password.getText().equals("password")){
+					password.setText("");
+				}
+			}
+
+			@Override
+			public void focusLost(FocusEvent e) {
+				if (password.getText().equals("")){
+					password.setText("password");
+				}
+			}
+		});
+		password.setColumns(12);
 		password.setEditable(true);
 		password.setSize(150, 20);
 
